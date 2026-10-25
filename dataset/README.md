@@ -33,6 +33,15 @@ dataset/
 - **13 类**病虫害，类别顺序见 `cotton_insect.yaml`（0–7 类已固定，8–12 待核对官方类目后重命名）。
 - 严重度按 **0–3 级**标注（健康 / 轻度 / 中度 / 重度）；分级结果由检测框面积占比 + 光谱指数联合判定，用于平台统计报表。
 
+### 补齐 8–12 类
+
+`cotton_insect.yaml` 中 `class_08`–`class_12` 是占位名，**需按 CottonInsect 官方类目顺序**填写：
+
+1. 打开官方数据集说明/论文，按其类别表顺序核对；
+2. 直接将占位名改为英文短名（如 `thrips`），中文名写在行尾注释；
+3. 若官方类别顺序与本地标注不一致，必须重跑 `voc2yolo.py`，否则标签会错位；
+4. 执行 `python dataset/check_dataset.py --strict`，占位名未清除时会以退出码 2 失败。
+
 ## 转换流程
 
 ```bash
@@ -55,3 +64,13 @@ yolo detect train data=dataset/cotton_insect.yaml model=yolo11n.pt epochs=100 im
 - 自动跳过 `difficult=1` 目标（可用 `--keep-difficult` 保留）；
 - 未知类别名计入统计并跳过，不会静默写入错误标签；
 - 退化框（宽或高 ≤ 1 像素）与缺失图像会被统计输出。
+
+## 数据集校验
+
+```bash
+python dataset/check_dataset.py --root dataset --splits train val test
+python dataset/check_dataset.py --strict   # 占位类别名未清除时以退出码 2 失败
+```
+
+检查内容：`nc` 与 `names` 数量一致、类别 id 连续、标签 id 不越界、坐标归一化、
+标签与图像一一配对、类别分布统计。建议在每次训练前执行。

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>新疆棉田病虫害智能识别平台</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>新疆棉田病虫害智能识别平台</h1>
+    <p class="sub">无人机多光谱 · YOLOv11-RGBT · 严重度分级</p>
+    <span class="badge">推理模式：{{ mode }}</span>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>影像上传</h2>
+      <form id="upload-form">
+        <label class="drop" id="drop">
+          <input type="file" id="file" name="file" accept="image/*,.tif,.tiff" multiple hidden>
+          <span id="drop-text">点击选择影像，或将文件拖到此处（支持 jpg / png / tif）</span>
+        </label>
+        <button type="submit">开始检测</button>
+        <span id="status" class="status"></span>
+      </form>
+    </section>
+
+    <section id="results"></section>
+
+    <section class="card">
+      <h2>检测任务历史</h2>
+      <table>
+        <thead>
+          <tr><th>任务 ID</th><th>文件</th><th>目标数</th><th>模型</th><th>时间（UTC）</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+          {% for task in tasks %}
+          <tr>
+            <td><code>{{ task.task_id }}</code></td>
+            <td>{{ task.filename }}</td>
+            <td>{{ task.total }}</td>
+            <td>{{ task.model }}</td>
+            <td>{{ task.created_at }}</td>
+            <td>
+              <a href="/api/preview/{{ task.task_id }}" target="_blank">检测图</a>
+              <a href="/api/heatmap/{{ task.task_id }}" target="_blank">热力图</a>
+              <a href="/api/report/{{ task.task_id }}" target="_blank">报表</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" class="empty">暂无任务</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById('upload-form');
+    const input = document.getElementById('file');
+    const drop = document.getElementById('drop');
+    const dropText = document.getElementById('drop-text');
+    const status = document.getElementById('status');
+    const results = document.getElementById('results');
+
+    input.addEventListener('change', () => {
+      dropText.textContent = input.files.length
+        ? `已选择 ${input.files.length} 个文件`
+        : '点击选择影像，或将文件拖到此处';
+    });
+
+    ['dragover', 'dragenter'].forEach(evt => drop.addEventListener(evt, e => {
+      e.preventDefault();
+      drop.classList.add('active');
+    }));
+    ['dragleave', 'drop'].forEach(evt => drop.addEventListener(evt, e => {
+      e.preventDefault();
+      drop.classList.remove('active');
+    }));
+    drop.addEventListener('drop', e => {
+      input.files = e.dataTransfer.files;
+      dropText.textContent = `已选择 ${input.files.length} 个文件`;
+    });
+
+    const severityName = {0: '健康', 1: '轻度', 2: '中度', 3: '重度'};
+
+    function taskCard(r) {
+      const dist = Object.entries(r.summary.severity_dist)
+        .map(([k, v]) => `<span class="pill sev${k}">${severityName[k]} ${v}</span>`).join('');
+      const rows = r.detections.map(d => `
+        <tr>
+          <td>${d.cls_name}</td>
+          <td>${d.conf.toFixed(2)}</td>
+          <td>${(d.area_ratio * 100).toFixed(3)}%</td>
+          <td><span class="pill sev${d.severity}">${d.severity_label}</span></td>
+        </tr>`).join('');
+      return `
+        <div class="card">
+          <h3>${r.image} <small>${r.task_id}</small></h3>
+          <p class="meta">目标数 ${r.summary.total} · 植被指数 ${r.summary.veg_index}</p>
+          <div class="pills">${dist}</div>
+          <div class="thumbs">
+            <figure><img src="${r.urls.preview}" alt="检测结果"><figcaption>检测结果</figcaption></figure>
+            <figure><img src="${r.urls.heatmap}" alt="分布热力图"><figcaption>分布热力图</figcaption></figure>
+          </div>
+          <table>
+            <thead><tr><th>类别</th><th>置信度</th><th>面积占比</th><th>严重度</th></tr></thead>
+            <tbody>${rows || '<tr><td colspan="4" class="empty">未检出目标</td></tr>'}</tbody>
+          </table>
+        </div>`;
+    }
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      if (!input.files.length) { status.textContent = '请先选择影像'; return; }
+      const body = new FormData();
+      Array.from(input.files).forEach(f => body.append('files', f));
+      status.textContent = '检测中…';
+      try {
+        const resp = await fetch('/api/detect/batch', {method: 'POST', body});
+        if (!resp.ok) throw new Error((await resp.json()).detail || resp.statusText);
+        const data = await resp.json();
+        results.innerHTML = data.results.map(taskCard).join('');
+        status.textContent = `完成，共 ${data.count} 张`;
+      } catch (err) {
+        status.textContent = '失败：' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

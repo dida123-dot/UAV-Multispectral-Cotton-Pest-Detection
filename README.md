@@ -40,12 +40,11 @@
 | `models/` | YOLOv11-RGBT 双流融合网络：通道/空间注意力、P3 中期融合、小目标增强 | [models/README.md](models/README.md) |
 | `experiments/` | 消融实验与可视化：PR 曲线、混淆矩阵、热力图、单模态 vs 融合对比 | [experiments/README.md](experiments/README.md) |
 | `platform/` | 线上仿真检测平台：后端推理服务 + 前端界面 + 报表/热力图 | [platform/README.md](platform/README.md) |
-| `docs/` | 项目文档：研究计划、进度安排、参考文献 | [docs/README.md](docs/README.md) |
+| `docs/` | 项目文档：研究计划、参考文献 | [docs/README.md](docs/README.md) |
 
-```text
+```
 .
 ├── README.md                 项目说明
-├── research-plan.md          研究计划（摘自项目申报书）
 ├── requirements.txt          Python 依赖
 ├── CITATION.cff              引用信息
 ├── CONTRIBUTING.md           协作规范
@@ -55,7 +54,7 @@
 ├── models/                   YOLOv11-RGBT 双流融合网络
 ├── experiments/              消融实验与结果可视化
 ├── platform/                 线上仿真检测平台
-└── docs/                     项目文档
+└── docs/                     项目文档（研究计划、参考文献）
 ```
 
 ## 环境要求
@@ -102,16 +101,30 @@ yolo detect train data=dataset/cotton_insect.yaml model=yolo11n.pt epochs=100 im
 python multispectral/vegetation_indices.py --input <multispectral.tif> --outdir outputs/features
 ```
 
+## 线上仿真平台
+
+平台已提供可运行的推理服务骨架（权重缺失时自动进入 demo 模式）：
+
+```bash
+pip install fastapi "uvicorn[standard]" python-multipart
+
+cd platform && uvicorn app:app --reload --port 8000
+# 或：uvicorn --app-dir platform app:app --port 8000
+```
+
+启动后访问 <http://127.0.0.1:8000>：上传影像 → 检测框 / 严重度分级 → 统计报表与分布热力图。
+接口与自测说明见 [platform/README.md](platform/README.md)。
+
 ## 项目进度
 
 | 阶段 | 周期 | 内容 | 状态 |
 |------|------|------|------|
 | 一 | 第 1–16 周 | 文献调研、数据集整理与预处理、Linux + CUDA + PyTorch + Ultralytics 环境搭建 | 🚧 进行中 |
 | 二 | 第 17–36 周 | 基线 YOLOv11 训练、多光谱融合模块开发、双流网络构建、消融实验与可视化 | ⏳ 待开展 |
-| 三 | 第 37–46 周 | 后端推理服务与前端界面开发、系统联调与测试 | ⏳ 待开展 |
+| 三 | 第 37–46 周 | 后端推理服务与前端界面开发、系统联调与测试 | 🚧 骨架完成 |
 | 四 | 第 47–52 周 | 结项材料准备 | ⏳ 待开展 |
 
-详细研究目标、关键科学问题与预期成果见 [research-plan.md](research-plan.md)。
+详细研究目标、关键科学问题与预期成果见 [docs/research-plan.md](docs/research-plan.md)。
 
 ## 团队
 
