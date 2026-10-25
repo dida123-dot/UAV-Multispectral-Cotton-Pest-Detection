@@ -1,0 +1,55 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.venv/
+venv/
+env/
+
+# ---- 环境与密钥 ----
+.env
+.env.*
+!.env.example
+*.pem
+
+# ---- 数据集图像（版权 / 体积原因不入库，仅保留标注与配置） ----
+dataset/images/
+dataset/**/images/
+!dataset/**/images/.gitkeep
+*.jpg
+*.jpeg
+*.png
+*.tif
+*.tiff
+!docs/**/*.png
+!docs/**/*.jpg
+!experiments/**/*.png
+!experiments/**/*.jpg
+
+# ---- 模型权重与训练产物 ----
+*.pt
+*.pth
+*.onnx
+*.engine
+weights/
+runs/
+wandb/
+lightning_logs/
+outputs/
+
+# ---- 实验缓存 ----
+.ipynb_checkpoints/
+*.log
+cache/
+tmp/
+
+# ---- 编辑器与系统 ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

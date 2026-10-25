@@ -1,0 +1,32 @@
+# YOLOv11 数据集配置：新疆棉田病虫害（基于 CottonInsect，13 类）
+#
+# 使用前把 path 改为本机 dataset 目录的绝对路径，例如：
+#   path: /home/user/UAV-Multispectral-Cotton-Pest-Detection/dataset
+# （Ultralytics 会把相对 path 解析到 ~/datasets 下，因此这里必须用绝对路径）
+#
+# 目录约定：
+#   dataset/images/{train,val,test}/*.jpg
+#   dataset/labels/{train,val,test}/*.txt   # YOLO 格式：cls cx cy w h（归一化）
+
+path: /path/to/UAV-Multispectral-Cotton-Pest-Detection/dataset
+train: images/train
+val: images/val
+test: images/test
+
+# 类别顺序必须与标注文件一致，切勿随意调整
+nc: 13
+names:
+  0: aphid                    # 蚜虫
+  1: flea_beetle              # 双斑萤叶甲
+  2: plant_bug                # 牧草盲蝽
+  3: bollworm                 # 棉铃虫
+  4: verticillium_wilt        # 黄萎病
+  5: angular_leaf_spot        # 细菌性角斑病
+  6: boll_rot                 # 棉铃腐烂病
+  7: red_rot                  # 红腐病
+  # TODO: 8-12 类需按 CottonInsect 官方类目核对后重命名，改名后同步更新标注
+  8: class_08                 # TODO
+  9: class_09                 # TODO
+  10: class_10                # TODO
+  11: class_11                # TODO
+  12: class_12                # TODO

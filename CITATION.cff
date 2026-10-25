@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "若本项目对您的研究或教学有帮助，请按以下格式引用。"
+title: "基于无人机多光谱与 YOLOv11 的新疆棉田病虫害智能识别"
+abstract: >
+  面向新疆棉田病虫害监测场景，整合 CottonInsect、CPD-YOLO 等公开数据集并模拟多光谱影像，
+  在 YOLOv11 框架下构建 RGB 与多光谱特征深度融合的双流目标检测模型，
+  并提供支持严重度分级、统计报表与分布热力图的线上仿真检测平台。
+type: software
+authors:
+  - family-names: "丁"
+    given-names: "丹丹"
+  - family-names: "胡"
+    given-names: "馨月"
+  - family-names: "马"
+    given-names: "灵钰"
+  - family-names: "李"
+    given-names: "然"
+  - family-names: "张"
+    given-names: "宇翔"
+repository-code: "https://github.com/dida123-dot/UAV-Multispectral-Cotton-Pest-Detection"
+url: "https://github.com/dida123-dot/UAV-Multispectral-Cotton-Pest-Detection"
+license: MIT
+version: "0.1.0"
+keywords:
+  - 棉花病虫害检测
+  - 无人机多光谱
+  - YOLOv11
+  - 目标检测
+  - cotton pest detection
+  - UAV multispectral
+  - RGBT fusion
